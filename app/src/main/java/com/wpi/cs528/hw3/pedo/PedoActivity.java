@@ -4,17 +4,15 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class PedoActivity extends AppCompatActivity implements SensorEventListener, Steplistner{
-
-
+public class PedoActivity extends AppCompatActivity implements SensorEventListener, Steplistner {
     private TextView TvSteps;
     private StepDetector simpleStepDetector;
     private SensorManager sensorManager;
@@ -41,23 +39,18 @@ public class PedoActivity extends AppCompatActivity implements SensorEventListen
         Button BtnStop = (Button) findViewById(R.id.btn_stop);
 
 
-
         BtnStart.setOnClickListener(new View.OnClickListener() {
-
             @Override
             public void onClick(View arg0) {
-
                 numSteps = 0;
                 Log.i("activity started", "activity started");
                 System.out.println("activity started");
                 sensorManager.registerListener(PedoActivity.this, accel, SensorManager.SENSOR_DELAY_FASTEST);
-
             }
         });
 
 
         BtnStop.setOnClickListener(new View.OnClickListener() {
-
             @Override
             public void onClick(View arg0) {
                 Log.i("activity stopped", "activity stopped");
@@ -65,9 +58,6 @@ public class PedoActivity extends AppCompatActivity implements SensorEventListen
 
             }
         });
-
-
-
     }
 
 
@@ -75,23 +65,21 @@ public class PedoActivity extends AppCompatActivity implements SensorEventListen
     public void step(long timeNs) {
         numSteps++;
         String text = TEXT_NUM_STEPS + numSteps;
-        System.out.println("number of steps="+ numSteps);
+        System.out.println("number of steps=" + numSteps);
         TvSteps.setText(text);
-        if(numSteps >=6) {
+        if (numSteps >= 6) {
             String toast_text = null;
-			//geofence_trig is used for the differenciation between the geofence entry triggers
-            if(geofence_trig == 1) {
+            //geofence_trig is used for the differenciation between the geofence entry triggers
+            if (geofence_trig == 1) {
                 toast_text = getResources().getString(R.string.gordon);
-				library_count++;
-            }
-            else {
+                library_count++;
+            } else {
                 toast_text = getResources().getString(R.string.fuller);
-				fuller_count++;
+                fuller_count++;
             }
-            Toast.makeText(PedoActivity.this,toast_text, Toast.LENGTH_SHORT).show();
+            Toast.makeText(PedoActivity.this, toast_text, Toast.LENGTH_SHORT).show();
             sensorManager.unregisterListener(PedoActivity.this);
         }
-
     }
 
     @Override
