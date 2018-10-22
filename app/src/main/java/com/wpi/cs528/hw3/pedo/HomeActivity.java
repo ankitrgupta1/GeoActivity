@@ -37,16 +37,27 @@ import com.google.android.gms.tasks.OnSuccessListener;
 
 public class HomeActivity extends AppCompatActivity implements OnMapReadyCallback, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
     private static final String TAG = HomeActivity.class.getSimpleName();
-    private static final String GEOFENCE_LIB_ID = "LIBRARY";
-    private static final String GEOFENCE_FLR_ID = "FULLER";
+    private static final int REQ_PERMISSION = 200;
     private static final long GEO_DURATION = 60 * 60 * 1000;
     private static final float GEOFENCE_RADIUS = 50.0f; // in meters
-    private final int GEOFENCE_REQ_CODE = 0;
-    private FusedLocationProviderClient locationClient;
-    private static final int REQ_PERMISSION = 200;
-    private GoogleApiClient googleApiClient;
     private Toolbar toolbar;
     private GoogleMap map;
+    /**
+     * The a unique ID for the library geofence that prevents us form adding the geofence twice.
+     */
+    private static final String GEOFENCE_LIB_ID = "LIBRARY";
+    /**
+     * The a unique ID for the Fuller Labs geofence that prevents us form adding the geofence twice.
+     */
+    private static final String GEOFENCE_FLR_ID = "FULLER";
+    /**
+     * Used for polling our current location.
+     */
+    private FusedLocationProviderClient locationClient;
+    /**
+     * The GoogleApiClient needed for location updates.
+     */
+    private GoogleApiClient googleApiClient;
 
     @Override protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -206,8 +217,7 @@ public class HomeActivity extends AppCompatActivity implements OnMapReadyCallbac
         if (checkPermission()) {
             Intent intent = new Intent(this, GeofenceTransitionService.class);
             PendingIntent pending = PendingIntent.getService(
-                    this, GEOFENCE_REQ_CODE,
-                    intent, PendingIntent.FLAG_UPDATE_CURRENT);
+                    this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
             LocationServices.getGeofencingClient(this)
                     .addGeofences(request, pending);
         }
