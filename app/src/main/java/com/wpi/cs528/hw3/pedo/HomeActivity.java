@@ -66,9 +66,6 @@ public class HomeActivity extends AppCompatActivity implements OnMapReadyCallbac
      * The GoogleApiClient needed for location updates.
      */
     private GoogleApiClient googleApiClient;
-
-
-    private TextView TvSteps;
     private TextView libCountView;
     private TextView fullerCountView;
     private StepDetector simpleStepDetector;
@@ -80,15 +77,9 @@ public class HomeActivity extends AppCompatActivity implements OnMapReadyCallbac
     private static int fuller_count;
     private String geofence_trig;
     //Activity Recognition Variables
-
     BroadcastReceiver broadcastReceiver;
-
     private ImageView imgActivity;
-
     public static final String BROADCAST_DETECTED_ACTIVITY = "activity_intent";
-
-    static final long DETECTION_INTERVAL_IN_MILLISECONDS = 30 * 1000;
-
     public static final int CONFIDENCE = 70;
 
     @Override protected void onCreate(Bundle savedInstanceState) {
@@ -108,59 +99,14 @@ public class HomeActivity extends AppCompatActivity implements OnMapReadyCallbac
         startReceivingTransitions();
         connectToGoogleApi();
 
-
         //pedo activity and activity recognition code
-
         sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
         accel = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
         simpleStepDetector = new StepDetector();
         simpleStepDetector.registerListener(this);
 
-        TvSteps = (TextView) findViewById(R.id.tv_steps);
-        /*
-        Button BtnStart = (Button) findViewById(R.id.btn_start);
-        Button BtnStop = (Button) findViewById(R.id.btn_stop);
-        BtnStart.setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View arg0) {
-                numSteps = 0;
-                Log.i("activity started", "activity started");
-                System.out.println("activity started");
-                sensorManager.registerListener(PedoActivity.this, accel, SensorManager.SENSOR_DELAY_FASTEST);
-            }
-        });
-        BtnStop.setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View arg0) {
-                Log.i("activity stopped", "activity stopped");
-                sensorManager.unregisterListener(PedoActivity.this);
-            }
-        });
-        */
-
         //Activity Recognition
         imgActivity = findViewById(R.id.img_activity);
-        /*
-        Button btnStartTrcking = findViewById(R.id.btn_start_tracking);
-        Button btnStopTracking = findViewById(R.id.btn_stop_tracking);
-
-        btnStartTrcking.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                startTracking();
-            }
-        });
-
-        btnStopTracking.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                stopTracking();
-            }
-        });
-        */
-
         broadcastReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
@@ -283,8 +229,8 @@ public class HomeActivity extends AppCompatActivity implements OnMapReadyCallbac
     private void subscribeToLocationUpdates() {
         LocationRequest locationRequest;
         // Defined in milli seconds. This number in extremely low, and should be used only for debug
-        final int UPDATE_INTERVAL = 1000;
-        final int FASTEST_INTERVAL = 900;
+        final int UPDATE_INTERVAL = 2000;
+        final int FASTEST_INTERVAL = 1800;
         Log.i(TAG, "subscribeToLocationUpdates()");
         locationRequest = LocationRequest.create()
                 .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
@@ -295,7 +241,9 @@ public class HomeActivity extends AppCompatActivity implements OnMapReadyCallbac
             locationClient.requestLocationUpdates(locationRequest, new LocationCallback() {
                 @Override public void onLocationResult(LocationResult locationResult) {
                     for (Location l : locationResult.getLocations()) {
-                        Log.d(TAG, "Lat:" + l.getLatitude() + "Long:" + l.getLongitude());
+                        LatLng pos = new LatLng(l.getLatitude(), l.getLongitude());
+                        map.addMarker(new MarkerOptions().position(pos).title("Your current position"));
+                        map.moveCamera(CameraUpdateFactory.newLatLng(pos));
                     }
                 }
             }, null);
@@ -390,7 +338,7 @@ public class HomeActivity extends AppCompatActivity implements OnMapReadyCallbac
         numSteps++;
         String text = TEXT_NUM_STEPS + numSteps;
         System.out.println("number of steps=" + numSteps);
-        TvSteps.setText(text);
+//        TvSteps.setText(text);
         if (numSteps >= 6) {
             String toast_text = null;
             //geofence_trig is used for the differentiation between the geofence entry triggers
@@ -415,7 +363,7 @@ public class HomeActivity extends AppCompatActivity implements OnMapReadyCallbac
     public void onSensorChanged(SensorEvent event) {
         Log.i("activity started", "activity detected");
         if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
-            Log.i("activity started", "accelerometer activity detected");
+           // Log.i("activity started", "accelerometer activity detected");
             simpleStepDetector.updateAccel(
                     event.timestamp, event.values[0], event.values[1], event.values[2]);
         }
@@ -487,7 +435,7 @@ public class HomeActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     private void registerPedoSensor() {
         numSteps = 0;
-        Log.i("activity started", "activity started");
+        //Log.i("activity started", "activity started");
         System.out.println("activity started");
         sensorManager.registerListener(HomeActivity.this, accel, SensorManager.SENSOR_DELAY_FASTEST);
     }
