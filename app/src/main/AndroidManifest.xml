@@ -4,6 +4,7 @@
           package="com.wpi.cs528.hw3.pedo">
 
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+    <uses-permission android:name="com.google.android.gms.permission.ACTIVITY_RECOGNITION" />
 
     <application
         android:allowBackup="false"
@@ -20,7 +21,6 @@
         <activity android:name=".PedoActivity">
         </activity>
 
-        <service android:name=".GeofenceTransitionService"/>
 
         <activity
             android:name=".HomeActivity"
@@ -33,6 +33,10 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
+
+        <service android:name=".GeofenceTransitionService"/>
+        <service android:name=".DetectedActivitiesIntentService" />
+        <service android:name=".BackgroundDetectedActivitiesService" />
     </application>
 
 </manifest>
