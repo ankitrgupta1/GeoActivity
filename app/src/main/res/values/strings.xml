@@ -9,7 +9,6 @@
     <string name="activity_unknown">Unknown</string>
     <string name="activity_toast">You are</string>
     <string name="activity_running">Running</string>
-    <string name="fuller_visit">Visits to Fuller labs geofence: </string>
-    <string name="library_visit">Visits to Library geofence: </string>
-
+    <string name="fuller_visit">Visits to Fuller labs geofence: %1$d</string>
+    <string name="library_visit">Visits to Library geofence: %1$d</string>
 </resources>

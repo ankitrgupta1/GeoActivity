@@ -43,7 +43,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnSuccessListener;
 
-public class HomeActivity extends AppCompatActivity implements OnMapReadyCallback, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, SensorEventListener, Steplistner{
+public class HomeActivity extends AppCompatActivity implements OnMapReadyCallback, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, SensorEventListener, Steplistner {
     private static final String TAG = HomeActivity.class.getSimpleName();
     private static final int REQ_PERMISSION = 200;
     private static final long GEO_DURATION = 60 * 60 * 1000;
@@ -69,6 +69,8 @@ public class HomeActivity extends AppCompatActivity implements OnMapReadyCallbac
 
 
     private TextView TvSteps;
+    private TextView libCountView;
+    private TextView fullerCountView;
     private StepDetector simpleStepDetector;
     private SensorManager sensorManager;
     private Sensor accel;
@@ -76,7 +78,7 @@ public class HomeActivity extends AppCompatActivity implements OnMapReadyCallbac
     private int numSteps;
     private static int library_count;
     private static int fuller_count;
-    private int geofence_trig = 1;
+    private String geofence_trig;
     //Activity Recognition Variables
 
     BroadcastReceiver broadcastReceiver;
@@ -94,6 +96,10 @@ public class HomeActivity extends AppCompatActivity implements OnMapReadyCallbac
         setContentView(R.layout.activity_home);
         toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        fullerCountView = findViewById(R.id.fullerCountView);
+        libCountView = findViewById(R.id.libCountView);
+        fullerCountView.setText(getString(R.string.fuller_visit, 0));
+        libCountView.setText(getString(R.string.library_visit, 0));
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
@@ -158,6 +164,7 @@ public class HomeActivity extends AppCompatActivity implements OnMapReadyCallbac
         broadcastReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
+                Log.i(TAG, "received activity broadcast");
                 if (intent.getAction().equals(BROADCAST_DETECTED_ACTIVITY)) {
                     int type = intent.getIntExtra("type", -1);
                     int confidence = intent.getIntExtra("confidence", 0);
@@ -211,6 +218,9 @@ public class HomeActivity extends AppCompatActivity implements OnMapReadyCallbac
 
                 if (transition == Geofence.GEOFENCE_TRANSITION_ENTER) {
                     Log.d("HomeActivity", "Entering " + id);
+                    registerPedoSensor();
+                    geofence_trig = id;
+
                 } else if (transition == Geofence.GEOFENCE_TRANSITION_EXIT) {
                     Log.d("HomeActivity", "Exiting " + id);
                 }
@@ -375,26 +385,24 @@ public class HomeActivity extends AppCompatActivity implements OnMapReadyCallbac
         );
     }
 
-
-
     @Override
     public void step(long timeNs) {
         numSteps++;
         String text = TEXT_NUM_STEPS + numSteps;
-        System.out.println("number of steps="+ numSteps);
+        System.out.println("number of steps=" + numSteps);
         TvSteps.setText(text);
-        if(numSteps >=6) {
+        if (numSteps >= 6) {
             String toast_text = null;
-            //geofence_trig is used for the differenciation between the geofence entry triggers
-            if(geofence_trig == 1) {
+            //geofence_trig is used for the differentiation between the geofence entry triggers
+            if (geofence_trig == null) return;
+            if (geofence_trig.equals(GEOFENCE_LIB_ID)) {
                 toast_text = getResources().getString(R.string.gordon);
-                library_count++;
-            }
-            else {
+                libCountView.setText(getString(R.string.library_visit, ++library_count));
+            } else if (geofence_trig.equals(GEOFENCE_FLR_ID)) {
                 toast_text = getResources().getString(R.string.fuller);
-                fuller_count++;
+                fullerCountView.setText(getString(R.string.fuller_visit, ++fuller_count));
             }
-            Toast.makeText(HomeActivity.this,toast_text, Toast.LENGTH_SHORT).show();
+            Toast.makeText(HomeActivity.this, toast_text, Toast.LENGTH_SHORT).show();
             sensorManager.unregisterListener(HomeActivity.this);
         }
     }
@@ -438,13 +446,13 @@ public class HomeActivity extends AppCompatActivity implements OnMapReadyCallbac
         Log.e(TAG, "User activity: " + label + ", Confidence: " + confidence);
 
         if (confidence > CONFIDENCE) {
-            Toast toast = Toast.makeText(this.getApplicationContext(),getString(R.string.activity_toast)+" "+label,Toast.LENGTH_SHORT);
+            Toast toast = Toast.makeText(this.getApplicationContext(), getString(R.string.activity_toast) + " " + label, Toast.LENGTH_SHORT);
             toast.show();
-            if(label.equals(getString(R.string.activity_running))){
+            if (label.equals(getString(R.string.activity_running))) {
                 imgActivity.setImageResource(R.drawable.run);
-            }else if(label.equals(getString(R.string.activity_walking))){
+            } else if (label.equals(getString(R.string.activity_walking))) {
                 imgActivity.setImageResource(R.drawable.walk);
-            }else if(label.equals(getString(R.string.activity_still))){
+            } else if (label.equals(getString(R.string.activity_still))) {
                 imgActivity.setImageResource(R.drawable.still);
             }
         }
@@ -466,11 +474,13 @@ public class HomeActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
     private void startTracking() {
+        Log.i(TAG, "startActivity");
         Intent intent = new Intent(HomeActivity.this, BackgroundDetectedActivitiesService.class);
         startService(intent);
     }
 
     private void stopTracking() {
+        Log.i(TAG, "startActivity");
         Intent intent = new Intent(HomeActivity.this, BackgroundDetectedActivitiesService.class);
         stopService(intent);
     }
