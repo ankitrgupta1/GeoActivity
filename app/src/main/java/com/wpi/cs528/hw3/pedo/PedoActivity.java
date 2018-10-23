@@ -52,7 +52,6 @@ public class PedoActivity extends AppCompatActivity implements SensorEventListen
         Button BtnStart = (Button) findViewById(R.id.btn_start);
         Button BtnStop = (Button) findViewById(R.id.btn_stop);
         BtnStart.setOnClickListener(new View.OnClickListener() {
-
             @Override
             public void onClick(View arg0) {
                 numSteps = 0;
@@ -62,7 +61,6 @@ public class PedoActivity extends AppCompatActivity implements SensorEventListen
             }
         });
         BtnStop.setOnClickListener(new View.OnClickListener() {
-
             @Override
             public void onClick(View arg0) {
                 Log.i("activity stopped", "activity stopped");
@@ -108,20 +106,19 @@ public class PedoActivity extends AppCompatActivity implements SensorEventListen
     public void step(long timeNs) {
         numSteps++;
         String text = TEXT_NUM_STEPS + numSteps;
-        System.out.println("number of steps="+ numSteps);
+        System.out.println("number of steps=" + numSteps);
         TvSteps.setText(text);
-        if(numSteps >=6) {
+        if (numSteps >= 6) {
             String toast_text = null;
-			//geofence_trig is used for the differenciation between the geofence entry triggers
-            if(geofence_trig == 1) {
+            //geofence_trig is used for the differenciation between the geofence entry triggers
+            if (geofence_trig == 1) {
                 toast_text = getResources().getString(R.string.gordon);
-				library_count++;
-            }
-            else {
+                library_count++;
+            } else {
                 toast_text = getResources().getString(R.string.fuller);
-				fuller_count++;
+                fuller_count++;
             }
-            Toast.makeText(PedoActivity.this,toast_text, Toast.LENGTH_SHORT).show();
+            Toast.makeText(PedoActivity.this, toast_text, Toast.LENGTH_SHORT).show();
             sensorManager.unregisterListener(PedoActivity.this);
         }
     }

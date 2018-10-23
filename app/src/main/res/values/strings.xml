@@ -2,6 +2,8 @@
     <string name="app_name">Pedo</string>
     <string name="gordon">You have taken 6 steps inside the Gordon Library Geofence, incrementing counter</string>
     <string name="fuller">You have taken 6 steps inside the Fuller Lab Geofence, incrementing counter</string>
+    <string name="title_activity_main">MainActivity</string>
+    <string name="title_activity_home">Map</string>
     <string name="activity_still">Still</string>
     <string name="activity_walking">Walking</string>
     <string name="activity_unknown">Unknown</string>
